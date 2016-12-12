@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <title>Chat</title>
+    <style>
+        #chat {
+            height: 300px;
+            border: solid 1px black;
+            font-family: "monospace"
+        }
+    </style>
+</head>
+<body>
+
+TODO <input type="text" id="newTodoItem">
+<ul id="itemsTodo">
+
+</ul>
+
+PROGRESS
+<ul id="itemsProgress">
+
+</ul>
+
+DONE
+<ul id="itemsDone">
+
+</ul>
+
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io.connect();
+
+    /* statusses
+        0: todo
+        1: progress
+        2: done
+     */
+
+
+
+    // Checks if a new toto item is submitted
+    document.onkeyup = function (e) {
+        if (e.which === 13) {
+            var newTodoItem = {};
+            newTodoItem.id = parseFloat(new Date().getTime() + Math.random());
+            newTodoItem.status = 0;
+            newTodoItem.action = document.getElementById("newTodoItem").value;
+            if (newTodoItem !== '') {
+                socket.emit("submitNewTodoItemMessage", newTodoItem);
+                console.log('*************', newTodoItem);
+            }
+            document.getElementById("newTodoItem").value = "";
+        }
+    };
+
+
+    socket.on("listOfAllTodoItemsMessage", function (listOfAllTodoItems) {
+        var itemsTodo = [], itemsProgress = [], itemsDone = [];
+        for (var i = 0; i < listOfAllTodoItems.length; i++) {
+
+            var item = listOfAllTodoItems[i];
+
+            var clickItem = "<li>" + item.action + " <span class='changeStatus' id='p_" + item.id + "'>^</span> <span class='changeStatus' id='n_" + item.id + "'>v</span></li>";
+
+            if (listOfAllTodoItems[i].status === 0) {
+                itemsTodo.push(clickItem);
+            } else if (listOfAllTodoItems[i].status === 1) {
+                itemsProgress.push(clickItem);
+            } else if (listOfAllTodoItems[i].status === 2) {
+                itemsDone.push(clickItem);
+            }
+
+            document.getElementById('itemsTodo').innerHTML = itemsTodo.join("");
+            document.getElementById('itemsProgress').innerHTML = itemsProgress.join("");
+            document.getElementById('itemsDone').innerHTML = itemsDone.join("");
+
+        }
+
+        $(".changeStatus").click(function (e) {
+            socket.emit("submitStatusUpdateTodoItemMessage", e.target.id);
+        });
+
+        $(".changeStatus").css('cursor', 'pointer');
+    });
+
+
+
+
+</script>
+</body>
+</html>
