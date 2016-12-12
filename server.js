@@ -10,6 +10,7 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
+// TODO: populate this list with items from the database
 var todoItems = [];
 
 
@@ -17,9 +18,12 @@ io.sockets.on("connection", function (socket) {
 
     // Receives a newTodoItem and adds it to the todoItemsList
     socket.on("submitNewTodoItemMessage", function (toDoItem) {
-        console.log('submitNewTodoItemMessage', toDoItem);
-        todoItems.push(toDoItem);
-        io.sockets.emit("listOfAllTodoItemsMessage", todoItems);
+        console.log('>>>>> submitNewTodoItemMessage', toDoItem);
+        if (toDoItem.action !== '') {
+            todoItems.push(toDoItem);
+            // TODO: add items in the database
+            io.sockets.emit("listOfAllTodoItemsMessage", todoItems);
+        }
     });
 
     // Receives a newTodoItem and adds it to the todoItemsList
@@ -29,15 +33,16 @@ io.sockets.on("connection", function (socket) {
             var id = toDoItemIdElements[1];
             for (var i = 0; i < todoItems.length; i++) {
                 var item = todoItems[i];
-                console.log('>>>>>', item, id);
                 if (item.id == id) {
                     if (nextStatus === 'p') {
                         item.status--;
                     } else {
                         item.status++;
                     }
+                    // TODO: update items in the database
                 }
 
+                // Items can have no lower status than 0 (to do).
                 if (item.status < 0) {
                     item.status = 0;
                 }

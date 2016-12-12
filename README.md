@@ -1,4 +1,4 @@
-# Minimal chat client with node and socket.io
+# Minimal todo app with node and socket.io
 
 ## Installation
 
@@ -10,9 +10,9 @@
 
 ```node server.js```
 
-Point your browser to http://hostname:5000
+Point your browser to http://localhost:5000
 
-Point an other browser to http://hostname:5000
+Point an other browser to http://localhost:5000
 
 ## Tests
 

@@ -1,14 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Chat</title>
-    <style>
-        #chat {
-            height: 300px;
-            border: solid 1px black;
-            font-family: "monospace"
-        }
-    </style>
+    <title>Simple Todo</title>
 </head>
 <body>
 
@@ -34,11 +27,14 @@ DONE
     var socket = io.connect();
 
     /* statusses
-        0: todo
-        1: progress
-        2: done
+     0: todo
+     1: progress
+     2: done
      */
 
+    window.addEventListener('DOMContentLoaded', function () {
+        socket.emit("submitNewTodoItemMessage", {});
+    }, false);
 
 
     // Checks if a new toto item is submitted
@@ -50,7 +46,6 @@ DONE
             newTodoItem.action = document.getElementById("newTodoItem").value;
             if (newTodoItem !== '') {
                 socket.emit("submitNewTodoItemMessage", newTodoItem);
-                console.log('*************', newTodoItem);
             }
             document.getElementById("newTodoItem").value = "";
         }
@@ -85,8 +80,6 @@ DONE
 
         $(".changeStatus").css('cursor', 'pointer');
     });
-
-
 
 
 </script>
