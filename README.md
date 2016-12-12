@@ -2,7 +2,7 @@
 
 ## Installation
 
-```git clone https://github.com/theotheu/chat```
+```git clone https://github.com/theotheu/simple-todo```
 
 ```cd chat```
 
