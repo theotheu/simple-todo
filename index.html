@@ -21,10 +21,9 @@ DONE
 </ul>
 
 
+<script src="//cdn.jsdelivr.net/pouchdb/6.1.0/pouchdb.min.js"></script>
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
 <script>
-    var socket = io.connect();
 
     /* statusses
      0: todo
@@ -32,56 +31,132 @@ DONE
      2: done
      */
 
-    window.addEventListener('DOMContentLoaded', function () {
-        socket.emit("submitNewTodoItemMessage", {});
-    }, false);
+    var db = new PouchDB('todos');
+
+    // Replace with remote instance, this just replicates to another local instance.
+    //var remoteCouch = 'todos_remote';
+    var remoteCouch = 'http://theotheu:moeilijkwachtwoord@node158.tezzt.nl:5984/todos';
+
+
+    db.changes({
+        since: 'now',
+        live: true
+    }).on('change', showTodos);
 
 
     // Checks if a new toto item is submitted
     document.onkeyup = function (e) {
         if (e.which === 13) {
             var newTodoItem = {};
-            newTodoItem.id = parseFloat(new Date().getTime() + Math.random());
+            newTodoItem._id = (parseFloat(new Date().getTime() + Math.random())).toString();
             newTodoItem.status = 0;
             newTodoItem.action = document.getElementById("newTodoItem").value;
-            if (newTodoItem !== '') {
-                socket.emit("submitNewTodoItemMessage", newTodoItem);
-            }
+            // TODO
+            addTodo(newTodoItem);
             document.getElementById("newTodoItem").value = "";
         }
     };
 
 
-    socket.on("listOfAllTodoItemsMessage", function (listOfAllTodoItems) {
-        var itemsTodo = [], itemsProgress = [], itemsDone = [];
-        for (var i = 0; i < listOfAllTodoItems.length; i++) {
+    // Initialise a sync with the remote server
+    function sync() {
+        console.log('>>>>> Syncing...');
+        var opts = {live: true};
+        db.replicate.to(remoteCouch, opts, syncError);
+        db.replicate.from(remoteCouch, opts, syncError);
+    }
 
-            var item = listOfAllTodoItems[i];
+    // There was some form or error syncing
+    function syncError(e) {
+        console.log('>>>>> Error', e);
+    }
 
-            var clickItem = "<li>" + item.action + " <span class='changeStatus' id='p_" + item.id + "'>^</span> <span class='changeStatus' id='n_" + item.id + "'>v</span></li>";
+    // CREATE
+    function addTodo(todo) {
+        console.log('>>>>> CREATE', todo);
+        db.put(todo, function callback(err, result) {
+            if (!err) {
+                console.log('Successfully posted a todo!');
+            } else {
+                console.log('>>>>>', err);
+            }
+        });
+    }
 
-            if (listOfAllTodoItems[i].status === 0) {
-                itemsTodo.push(clickItem);
-            } else if (listOfAllTodoItems[i].status === 1) {
-                itemsProgress.push(clickItem);
-            } else if (listOfAllTodoItems[i].status === 2) {
-                itemsDone.push(clickItem);
+    // RETRIEVE
+    function showTodos() {
+
+        db.allDocs({include_docs: true, descending: true}, function (err, docs) {
+            var itemsTodo = [], itemsProgress = [], itemsDone = [];
+
+            for (var i = 0; i < docs.rows.length; i++) {
+                var item = docs.rows[i].doc;
+
+                var clickItem = "<li>" + item.action + " <span class='changeStatus' id='p_" + item._id + "'>^</span> <span class='changeStatus' id='n_" + item._id + "'>v</span></li>";
+                if (item.status === undefined || item.status === 0) {
+                    itemsTodo.push(clickItem);
+                } else if (item.status === 1) {
+                    itemsProgress.push(clickItem);
+                } else if (item.status === 2) {
+                    itemsDone.push(clickItem);
+                }
+                document.getElementById('itemsTodo').innerHTML = itemsTodo.join("");
+                document.getElementById('itemsProgress').innerHTML = itemsProgress.join("");
+                document.getElementById('itemsDone').innerHTML = itemsDone.join("");
             }
 
-            document.getElementById('itemsTodo').innerHTML = itemsTodo.join("");
-            document.getElementById('itemsProgress').innerHTML = itemsProgress.join("");
-            document.getElementById('itemsDone').innerHTML = itemsDone.join("");
+            var nodes = document.getElementsByClassName('changeStatus');
+            for (i = 0; i < nodes.length; i++) {
+                nodes[i].addEventListener('click', updateItem, false);
+                nodes[i].addEventListener('mouseover', function () {
+                    this.style.cursor = 'pointer';
+                });
+                nodes[i].addEventListener('mouseout', function () {
+                    this.style.cursor = 'normal';
+                });
+            }
+        });
+    }
 
-        }
 
-        $(".changeStatus").click(function (e) {
-            socket.emit("submitStatusUpdateTodoItemMessage", e.target.id);
+    // UPDATE
+    function updateItem(e) {
+        var parts = e.target.id.split("_");
+        var newStatus = parts[0];
+        var _id = parts[1];
+
+        // retrieve local document
+        db.get(_id).then(function (doc) {
+            if (newStatus === 'p') {
+                doc.status--;
+            } else {
+                doc.status++;
+            }
+            if (doc.status < 0) {
+                doc.status = 0;
+            }
+
+            db.put(doc, function callback(err, result) {
+                if (!err) {
+                    console.log('Successfully updated a todo!');
+                } else {
+                    console.log('>>>>>', err);
+                }
+            });
         });
 
-        $(".changeStatus").css('cursor', 'pointer');
-    });
+
+    }
+
+    showTodos();
+
+
+    if (remoteCouch) {
+        sync();
+    }
 
 
 </script>
+
 </body>
 </html>
