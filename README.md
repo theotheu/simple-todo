@@ -1,5 +1,10 @@
 # Minimal todo app with node and socket.io
 
+## Requirements
+For live syncing with a server, you need couchdb.
+
+On a Ubuntu server, you install couchdb with`apt-get install couchdb`.
+
 ## Installation
 
 ```git clone https://github.com/theotheu/simple-todo```
