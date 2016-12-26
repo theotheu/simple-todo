@@ -38,7 +38,7 @@ document.onkeyup = function (e) {
 function sync() {
     console.log('>>>>> Syncing...');
     document.getElementById("msg").innerHTML = 'Live syncing';
-    document.getElementById("msg").style.borderColor = 'green';
+    document.getElementById("msg").style.backgroundColor = 'green';
     var opts = {live: true};
     db.replicate.to(remoteCouch, opts, syncError);
     db.replicate.from(remoteCouch, opts, syncError);
