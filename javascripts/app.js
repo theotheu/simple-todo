@@ -37,6 +37,8 @@ document.onkeyup = function (e) {
 // Initialise a sync with the remote server
 function sync() {
     console.log('>>>>> Syncing...');
+    document.getElementById("msg").innerHTML = 'Live syncing';
+    document.getElementById("msg").style.borderColor = 'green';
     var opts = {live: true};
     db.replicate.to(remoteCouch, opts, syncError);
     db.replicate.from(remoteCouch, opts, syncError);
@@ -45,6 +47,8 @@ function sync() {
 // There was some form or error syncing
 function syncError(e) {
     console.log('>>>>> Error', e);
+    document.getElementById("msg").innerHTML = err;
+    document.getElementById("msg").style.backgroundColor = 'red';
 }
 
 // CREATE
@@ -55,6 +59,8 @@ function addTodo(todo) {
             console.log('Successfully posted a todo!');
         } else {
             console.log('>>>>>', err);
+            document.getElementById("msg").innerHTML = err;
+            document.getElementById("msg").style.backgroundColor = 'red';
         }
     });
 }
@@ -117,6 +123,8 @@ function updateItem(e) {
                 console.log('Successfully updated a todo!');
             } else {
                 console.log('>>>>>', err);
+                document.getElementById("msg").innerHTML = err;
+                document.getElementById("msg").style.backgroundColor = 'red';
             }
         });
     });
