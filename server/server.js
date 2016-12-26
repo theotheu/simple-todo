@@ -1,17 +1,35 @@
 var express = require("express"),
     app = express(),
     server = require("http").createServer(app),
-    io = require("socket.io").listen(server);
+    io = require("socket.io").listen(server),
+    mongoose = require('mongoose');
+
+// DATABASE: initialising connection
+mongoose.connect('mongodb://localhost/simple-todo');
+
+// DATABASE: model
+var simpleTodoSchema = mongoose.Schema({
+    action: String,
+    status: Number
+});
+var simpleTodo= mongoose.model('simple-todo', simpleTodoSchema);
+
 
 server.listen(5000, function () {
     console.log('Listening on port 5000.');
 });
 app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/index.html");
+    res.sendFile(__dirname + "../client/index.html");
 });
 
 // TODO: populate this list with items from the database
 var todoItems = [];
+// DATABASE: getting initial items
+simpleTodo
+    .find({})
+    .exec(function(err, doc){
+        console.log('>>>>>', doc);
+    });
 
 
 io.sockets.on("connection", function (socket) {
