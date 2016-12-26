@@ -3,9 +3,12 @@
 }
 
 .failure {
-    background-color: coral;
+    background-color: lightcoral;
 }
 
 #msg {
     margin-bottom: 12px;
+    font-family: monospace;
+    white-space: pre;
+
 }
