@@ -133,7 +133,6 @@ function updateItem(e) {
 
 showTodos();
 
-
 if (remoteCouch) {
     sync();
 }
