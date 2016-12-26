@@ -38,7 +38,7 @@ document.onkeyup = function (e) {
 function sync() {
     console.log('>>>>> Syncing...');
     document.getElementById("msg").innerHTML = 'Live syncing';
-    document.getElementById("msg").style.backgroundColor = 'green';
+    document.getElementById("msg").className = "success";
     var opts = {live: true};
     db.replicate.to(remoteCouch, opts, syncError);
     db.replicate.from(remoteCouch, opts, syncError);
@@ -48,7 +48,7 @@ function sync() {
 function syncError(e) {
     console.log('>>>>> Error', e);
     document.getElementById("msg").innerHTML = err;
-    document.getElementById("msg").style.backgroundColor = 'red';
+    document.getElementById("msg").className = "failure";
 }
 
 // CREATE
@@ -60,7 +60,7 @@ function addTodo(todo) {
         } else {
             console.log('>>>>>', err);
             document.getElementById("msg").innerHTML = err;
-            document.getElementById("msg").style.backgroundColor = 'red';
+            document.getElementById("msg").className = "failure";
         }
     });
 }
@@ -124,7 +124,7 @@ function updateItem(e) {
             } else {
                 console.log('>>>>>', err);
                 document.getElementById("msg").innerHTML = err;
-                document.getElementById("msg").style.backgroundColor = 'red';
+                document.getElementById("msg").className = "failure";
             }
         });
     });

@@ -1,0 +1,11 @@
+.success {
+    background-color: lightgreen;
+}
+
+.failure {
+    background-color: coral;
+}
+
+#msg {
+    margin-bottom: 12px;
+}
