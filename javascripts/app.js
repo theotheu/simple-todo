@@ -121,7 +121,6 @@ function updateItem(e) {
         });
     });
 
-
 }
 
 showTodos();

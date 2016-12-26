@@ -4,15 +4,11 @@
 
 ```git clone https://github.com/theotheu/simple-todo```
 
-```cd chat```
+Make sure you clone it in a directory that is served by a http-server.
 
-```npm install```
+Point your browser to http://localhost
 
-```node server.js```
-
-Point your browser to http://localhost:5000
-
-Point an other browser to http://localhost:5000
+Point an other browser to http://localhost
 
 ## Tests
 
