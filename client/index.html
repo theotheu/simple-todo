@@ -41,7 +41,7 @@ DONE
     document.onkeyup = function (e) {
         if (e.which === 13) {
             var newTodoItem = {};
-            newTodoItem.id = parseFloat(new Date().getTime() + Math.random());
+            newTodoItem._id = (parseFloat(new Date().getTime() + Math.random())).toString();
             newTodoItem.status = 0;
             newTodoItem.action = document.getElementById("newTodoItem").value;
             if (newTodoItem !== '') {
@@ -58,7 +58,7 @@ DONE
 
             var item = listOfAllTodoItems[i];
 
-            var clickItem = "<li>" + item.action + " <span class='changeStatus' id='p_" + item.id + "'>^</span> <span class='changeStatus' id='n_" + item.id + "'>v</span></li>";
+            var clickItem = "<li>" + item.action + " <span class='changeStatus' id='p_" + item._id + "'>^</span> <span class='changeStatus' id='n_" + item._id + "'>v</span></li>";
 
             if (listOfAllTodoItems[i].status === 0) {
                 itemsTodo.push(clickItem);
@@ -75,7 +75,7 @@ DONE
         }
 
         $(".changeStatus").click(function (e) {
-            socket.emit("submitStatusUpdateTodoItemMessage", e.target.id);
+            socket.emit("submitStatusUpdateTodoItemMessage", e.target._id);
         });
 
         $(".changeStatus").css('cursor', 'pointer');
